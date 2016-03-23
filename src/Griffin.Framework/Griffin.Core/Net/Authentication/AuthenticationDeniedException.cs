@@ -10,7 +10,7 @@ namespace Griffin.Net.Authentication
     /// <summary>
     /// Failed to authenticate
     /// </summary>
-    [Serializable]
+    //[Serializable]
     public class AuthenticationDeniedException : Exception
     {
       
@@ -36,11 +36,11 @@ namespace Griffin.Net.Authentication
         /// </summary>
         /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
-        protected AuthenticationDeniedException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
+        //protected AuthenticationDeniedException(
+        //    SerializationInfo info,
+        //    StreamingContext context) : base(info, context)
+        //{
+        //}
 
         /// <summary>
         /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with information about the exception.
@@ -51,9 +51,9 @@ namespace Griffin.Net.Authentication
         ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Read="*AllFiles*" PathDiscovery="*AllFiles*" />
         ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="SerializationFormatter" />
         ///   </PermissionSet>
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-        }
+        //public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    base.GetObjectData(info, context);
+        //}
     }
 }

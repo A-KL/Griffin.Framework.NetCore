@@ -4,6 +4,8 @@ using Griffin.Net.Channels;
 
 namespace Griffin.Net.Protocols.Http.Messages
 {
+    using System.Reflection;
+
     /// <summary>
     ///     Used to parse the HTTP header.
     /// </summary>
@@ -28,7 +30,7 @@ namespace Griffin.Net.Protocols.Http.Messages
         /// </summary>
         public string State
         {
-            get { return _parserMethod.Method.Name; }
+            get { return _parserMethod.GetMethodInfo().Name; }
         }
 
         /// <summary>

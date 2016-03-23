@@ -9,7 +9,8 @@ namespace Griffin.Net.Authentication.Messages
     /// <remarks>
     /// <para>Uses the data contract attributes</para>
     /// </remarks>
-    [DataContract, Serializable]
+    [DataContract]
+    //[Serializable]
     public class Authenticate : IAuthenticate
     {
         /// <summary>

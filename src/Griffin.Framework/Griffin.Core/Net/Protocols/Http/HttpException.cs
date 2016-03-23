@@ -46,12 +46,12 @@ namespace Griffin.Net.Protocols.Http
         ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
         ///     information about the source or destination.
         /// </param>
-        protected HttpException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-            HttpCode = info.GetInt32("HttpCode");
-        }
+        //protected HttpException(
+        //    SerializationInfo info,
+        //    StreamingContext context) : base(info, context)
+        //{
+        //    HttpCode = info.GetInt32("HttpCode");
+        //}
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="HttpException" /> class.
@@ -92,10 +92,10 @@ namespace Griffin.Net.Protocols.Http
         ///         class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
         ///         version="1" Flags="SerializationFormatter" />
         /// </PermissionSet>
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("HttpCode", HttpCode);
-            base.GetObjectData(info, context);
-        }
+        //public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    info.AddValue("HttpCode", HttpCode);
+        //    base.GetObjectData(info, context);
+        //}
     }
 }

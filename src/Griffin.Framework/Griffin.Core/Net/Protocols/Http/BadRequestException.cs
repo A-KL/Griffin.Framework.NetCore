@@ -10,7 +10,7 @@ namespace Griffin.Net.Protocols.Http
     /// <remarks>
     ///     <para>Uses 400 as status code</para>
     /// </remarks>
-    [Serializable]
+    //[Serializable]
     public class BadRequestException : HttpException
     {
         /// <summary>
@@ -44,10 +44,10 @@ namespace Griffin.Net.Protocols.Http
         ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
         ///     information about the source or destination.
         /// </param>
-        protected BadRequestException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
+        //protected BadRequestException(
+        //    SerializationInfo info,
+        //    StreamingContext context) : base(info, context)
+        //{
+        //}
     }
 }

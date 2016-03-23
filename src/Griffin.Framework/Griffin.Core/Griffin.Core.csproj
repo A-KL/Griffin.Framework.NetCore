@@ -337,9 +337,7 @@
   <ItemGroup>
     <Content Include="Net\cert\howto.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Net\Protocols\MessageDeserializers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Griffin.Core.rd.xml" />
