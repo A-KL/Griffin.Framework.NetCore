@@ -6,12 +6,39 @@ using System.Net.Sockets;
 using Griffin.Net.Buffers;
 using Griffin.Net.Channels;
 using Griffin.Net.Protocols;
-using Griffin.Net.Protocols.Http;
-using Griffin.Net.Protocols.MicroMsg;
+//using Griffin.Net.Protocols.MicroMsg;
 using Griffin.Net.Protocols.Serializers;
 
 namespace Griffin.Net
 {
+    public class ErrorEventArgs : EventArgs
+    {
+        private Exception exception;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.IO.ErrorEventArgs"/> class.
+        /// </summary>
+        /// <param name="exception">An <see cref="T:System.Exception"/> that represents the error that occurred. </param>
+        public ErrorEventArgs(Exception exception)
+        {
+            this.exception = exception;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="T:System.Exception"/> that represents the error that occurred.
+        /// </summary>
+        /// 
+        /// <returns>
+        /// An <see cref="T:System.Exception"/> that represents the error that occurred.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public virtual Exception GetException()
+        {
+            return this.exception;
+        }
+    }
+
+
     /// <summary>
     ///     Listens on one of the specified protocols
     /// </summary>
@@ -21,7 +48,8 @@ namespace Griffin.Net
         private IBufferSlicePool _bufferPool;
         private ITcpChannelFactory _channelFactory;
         private ChannelTcpListenerConfiguration _configuration;
-        private TcpListener _listener;
+        private Socket listener;
+        private SocketAsyncEventArgs listenerArgs;
         private MessageHandler _messageReceived;
         private MessageHandler _messageSent;
         private volatile bool _shuttingDown;
@@ -33,21 +61,29 @@ namespace Griffin.Net
         {
             if (configuration == null) throw new ArgumentNullException("configuration");
 
-            Configure(configuration);
-            ChannelFactory = new TcpChannelFactory();
+            this.Configure(configuration);
+            this.ChannelFactory = new TcpChannelFactory();
+
+
+            this.listenerArgs = new SocketAsyncEventArgs();
+            this.listenerArgs.Completed += this.OnAcceptSocket;
         }
 
         /// <summary>
         /// </summary>
         public ChannelTcpListener()
         {
-            Configure(
-                new ChannelTcpListenerConfiguration(
-                    () => new MicroMessageDecoder(new DataContractMessageSerializer()),
-                    () => new MicroMessageEncoder(new DataContractMessageSerializer()))
-                );
+            //this.Configure(
+            //    new ChannelTcpListenerConfiguration(
+            //        () => new MicroMessageDecoder(new DataContractMessageSerializer()),
+            //        () => new MicroMessageEncoder(new DataContractMessageSerializer()))
+            //    );
 
-            ChannelFactory = new TcpChannelFactory();
+            this.ChannelFactory = new TcpChannelFactory();
+
+
+            this.listenerArgs = new SocketAsyncEventArgs();
+            this.listenerArgs.Completed += this.OnAcceptSocket;
         }
 
         /// <summary>
@@ -61,10 +97,10 @@ namespace Griffin.Net
         {
             get
             {
-                if (_listener == null)
+                if (this.listener == null)
                     return -1;
 
-                return ((IPEndPoint) _listener.LocalEndpoint).Port;
+                return ((IPEndPoint) this.listener.LocalEndPoint).Port;
             }
         }
 
@@ -73,13 +109,13 @@ namespace Griffin.Net
         /// </summary>
         public ITcpChannelFactory ChannelFactory
         {
-            get { return _channelFactory; }
+            get { return this._channelFactory; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException();
 
-                _channelFactory = value;
+                this._channelFactory = value;
             }
         }
 
@@ -88,8 +124,8 @@ namespace Griffin.Net
         /// </summary>
         public MessageHandler MessageReceived
         {
-            get { return _messageReceived; }
-            set { _messageReceived = value ?? delegate { }; }
+            get { return this._messageReceived; }
+            set { this._messageReceived = value ?? delegate { }; }
         }
 
         /// <summary>
@@ -97,8 +133,8 @@ namespace Griffin.Net
         /// </summary>
         public MessageHandler MessageSent
         {
-            get { return _messageSent; }
-            set { _messageSent = value ?? delegate { }; }
+            get { return this._messageSent; }
+            set { this._messageSent = value ?? delegate { }; }
         }
 
         /// <summary>
@@ -125,22 +161,25 @@ namespace Griffin.Net
         {
             if (port < 0)
                 throw new ArgumentOutOfRangeException("port", port, "Port must be 0 or more.");
-            if (_listener != null)
+            if (this.listener != null)
                 throw new InvalidOperationException("Already listening.");
 
-            _shuttingDown = false;
-            _listener = new TcpListener(address, port);
-            _listener.Start();
+            this._shuttingDown = false;
+            this.listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.listener.Bind(new IPEndPoint(address, port));
+
 
             for (int i = 0; i < 20; i++)
             {
-                var decoder = _configuration.DecoderFactory();
-                var encoder = _configuration.EncoderFactory();
-                var channel  = _channelFactory.Create(_bufferPool.Pop(), encoder, decoder);
-                _channels.Push(channel);
+                var decoder = this._configuration.DecoderFactory();
+                var encoder = this._configuration.EncoderFactory();
+                var channel = this._channelFactory.Create(this._bufferPool.Pop(), encoder, decoder);
+                this._channels.Push(channel);
             }
 
-            _listener.BeginAcceptSocket(OnAcceptSocket, null);
+            this.listener.Listen(100);
+
+            this.StartAccept();
         }
 
         /// <summary>
@@ -148,8 +187,8 @@ namespace Griffin.Net
         /// </summary>
         public virtual void Stop()
         {
-            _shuttingDown = true;
-            _listener.Stop();
+            this._shuttingDown = true;
+            this.listener.Dispose();
         }
 
         /// <summary>
@@ -163,8 +202,8 @@ namespace Griffin.Net
         /// <param name="configuration"></param>
         protected void Configure(ChannelTcpListenerConfiguration configuration)
         {
-            _bufferPool = configuration.BufferPool;
-            _configuration = configuration;
+            this._bufferPool = configuration.BufferPool;
+            this._configuration = configuration;
         }
 
 
@@ -176,7 +215,7 @@ namespace Griffin.Net
         protected virtual ClientConnectedEventArgs OnClientConnected(ITcpChannel channel)
         {
             var args = new ClientConnectedEventArgs(channel);
-            ClientConnected(this, args);
+            this.ClientConnected(this, args);
             return args;
         }
 
@@ -190,7 +229,7 @@ namespace Griffin.Net
         /// </param>
         protected virtual void OnClientDisconnected(ITcpChannel channel, Exception exception)
         {
-            ClientDisconnected(this, new ClientDisconnectedEventArgs(channel, exception));
+            this.ClientDisconnected(this, new ClientDisconnectedEventArgs(channel, exception));
         }
 
         /// <summary>
@@ -200,17 +239,62 @@ namespace Griffin.Net
         /// <param name="msg">Message (as decoded by the specified <see cref="IMessageDecoder" />).</param>
         protected virtual void OnMessage(ITcpChannel source, object msg)
         {
-            _messageReceived(source, msg);
+            this._messageReceived(source, msg);
         }
 
         private void OnChannelDisconnect(ITcpChannel source, Exception exception)
         {
-            OnClientDisconnected(source, exception);
+            this.OnClientDisconnected(source, exception);
             source.Cleanup();
-            _channels.Push(source);
+            this._channels.Push(source);
         }
 
-        private void OnAcceptSocket(IAsyncResult ar)
+        private void StartAccept()
+        {
+           // this.maxNumberAcceptedClients.WaitOne();
+
+            this.listenerArgs.AcceptSocket = null;
+            var willRaiseEvent = this.listener.AcceptAsync(this.listenerArgs);
+            if (!willRaiseEvent)
+            {
+                this.OnAcceptSocket(this, this.listenerArgs);
+            }
+        }
+
+        //private void OnAccept(object sender, SocketAsyncEventArgs e)
+        //{
+        //    if (e.SocketError != SocketError.Success)
+        //    {
+        //        this.shutdown.Set();
+        //        return;
+        //    }
+        //    Interlocked.Increment(ref this.numConnectedSockets);
+
+        //    ServerClientContext context;
+        //    if (!this.contexts.TryPop(out context))
+        //        throw new InvalidOperationException("Failed to get a new client context, all is currently in use.");
+
+        //    if (!this.ValidateClient(e.AcceptSocket))
+        //    {
+        //        try
+        //        {
+        //            e.AcceptSocket.Shutdown(SocketShutdown.Send);
+        //        }
+        //        catch
+        //        {
+        //        }
+        //        e.AcceptSocket.Dispose();
+        //        return;
+        //    }
+
+        //    var client = this.CreateClient(e.AcceptSocket.RemoteEndPoint);
+        //    context.Assign(e.AcceptSocket, client);
+        //    this.OnClientConnected(context);
+
+        //    this.StartAccept();
+        //}
+
+        private void OnAcceptSocket(object sender, SocketAsyncEventArgs e)
         {
             if (_shuttingDown)
                 return;
@@ -219,10 +303,8 @@ namespace Griffin.Net
             {
                 // Required as _listener.Stop() disposes the underlying socket
                 // thus causing an objectDisposedException here.
-                var socket = _listener.EndAcceptSocket(ar);
-
-
-
+                var socket = e.AcceptSocket;
+                
                 ITcpChannel channel;
                 if (!_channels.TryPop(out channel))
                 {
@@ -250,7 +332,7 @@ namespace Griffin.Net
             }
 
 
-            _listener.BeginAcceptSocket(OnAcceptSocket, null);
+            this.StartAccept();
         }
     }
 }

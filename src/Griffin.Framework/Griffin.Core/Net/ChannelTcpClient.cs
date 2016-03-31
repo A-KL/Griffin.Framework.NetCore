@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Griffin.Net.Authentication;
+//using Griffin.Net.Authentication;
 using Griffin.Net.Buffers;
 using Griffin.Net.Channels;
 
@@ -79,7 +79,7 @@ namespace Griffin.Net
         /// <summary>
         ///     Set if you want to authenticate against a server.
         /// </summary>
-        public IClientAuthenticator Authenticator { get; set; }
+        //public IClientAuthenticator Authenticator { get; set; }
 
         /// <summary>
         ///     Gets if channel is connected
@@ -158,9 +158,13 @@ namespace Griffin.Net
             if (_channel == null)
             {
                 if (Certificate != null)
-                    _channel = new SecureTcpChannel(_readBuffer, _encoder, _decoder, Certificate);
+                {
+                    //channel = new SecureTcpChannel(_readBuffer, _encoder, _decoder, Certificate);
+                }
                 else
+                {
                     _channel = new TcpChannel(_readBuffer, _encoder, _decoder);
+                }
 
                 _channel.Disconnected = OnDisconnect;
                 _channel.MessageSent = OnSendCompleted;
@@ -215,7 +219,7 @@ namespace Griffin.Net
             var casted = item as T;
             if (casted == null)
                 throw new InvalidCastException(string.Format("Failed to cast '{0}' as '{1}'.", item.GetType().FullName,
-                    typeof (T).FullName));
+                    typeof(T).FullName));
 
             return casted;
         }
@@ -272,7 +276,7 @@ namespace Griffin.Net
                     "Was signalled that something have been received, but found nothing in the in queue");
 
             if (item is ChannelException)
-                throw (ChannelException) item;
+                throw (ChannelException)item;
 
             // signal so that more items can be read directly
             if (_readItems.Count > 0)
@@ -306,8 +310,8 @@ namespace Griffin.Net
                 _sendException = null;
                 throw new AggregateException(ex);
             }
-            if (Authenticator != null && Authenticator.AuthenticationFailed)
-                throw new AuthenticationDeniedException("Failed to authenticate");
+            //if (Authenticator != null && Authenticator.AuthenticationFailed)
+            //    throw new AuthenticationDeniedException("Failed to authenticate");
 
             await _sendQueueSemaphore.WaitAsync();
 
@@ -348,12 +352,12 @@ namespace Griffin.Net
             set { _channel.BufferPreProcessor = value; }
         }
 
-       
+
         private void OnConnect(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success)
             {
-                _connectException = new SocketException((int) e.SocketError);
+                _connectException = new SocketException((int)e.SocketError);
                 _socket = null;
             }
             else

@@ -21,9 +21,10 @@ namespace Griffin.ApplicationServices
         /// </summary>
         protected ApplicationServiceTimer()
         {
-            _timer = new Timer(OnTimer);
             FirstInterval = TimeSpan.FromMilliseconds(500);
             Interval = TimeSpan.FromSeconds(5);
+            _timer = new Timer(OnTimer, null, FirstInterval,Interval);
+
         }
 
         /// <summary>

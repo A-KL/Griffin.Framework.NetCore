@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Net;
-using System.Security.Cryptography;
+//using System.Security.Cryptography;
 using System.Text;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
+using Windows.Storage.Streams;
 
 namespace Griffin.Net.Protocols.Http.Authentication
 {
@@ -119,9 +122,12 @@ namespace Griffin.Net.Protocols.Http.Authentication
         /// <returns></returns>
         public string Encode(EndPoint remoteEndPoint)
         {
-            var crypto = new HMACSHA256(Encoding.GetBytes(HashKey));
-            var value = crypto.ComputeHash(Encoding.GetBytes(remoteEndPoint.ToString()));
-            return Encoding.GetString(value);
+            var buffer = CryptographicBuffer.ConvertStringToBinary(this.HashKey, BinaryStringEncoding.Utf8);
+
+            var hashAlgorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
+            var hashBuffer = hashAlgorithm.HashData(buffer);
+
+            return CryptographicBuffer.EncodeToBase64String(hashBuffer);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Griffin.Net.Protocols.Serializers.Mono
             if (l2 > l1)
                 return false;
 
-            return (0 == String.Compare(str1, 0, str2, 0, l2, ignore_case, CultureInfo.InvariantCulture));
+            return (0 == string.Compare(str1, 0, str2, 0, l2, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
         }
 
         public static bool EndsWith(string str1, string str2)
@@ -69,7 +69,7 @@ namespace Griffin.Net.Protocols.Serializers.Mono
             if (l2 > l1)
                 return false;
 
-            return (0 == String.Compare(str1, l1 - l2, str2, 0, l2, ignore_case, CultureInfo.InvariantCulture));
+            return (0 == string.Compare(str1, l1 - l2, str2, 0, l2, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
         }
 
         public static string EscapeQuotesAndBackslashes(string attributeValue)

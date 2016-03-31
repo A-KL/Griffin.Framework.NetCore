@@ -6,7 +6,7 @@ namespace Griffin
     /// <summary>
     ///     Queue is full and no more items may be enqueued.
     /// </summary>
-    [Serializable]
+    //[Serializable]
     public class QueueFullException : Exception
     {
         private readonly string _queueName;
@@ -42,13 +42,13 @@ namespace Griffin
         ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
         ///     information about the source or destination.
         /// </param>
-        protected QueueFullException(
-            SerializationInfo info,
-            StreamingContext context)
-            : base(info, context)
-        {
-            _queueName = info.GetString("QueueName");
-        }
+        //protected QueueFullException(
+        //    SerializationInfo info,
+        //    StreamingContext context)
+        //    : base(info, context)
+        //{
+        //    _queueName = info.GetString("QueueName");
+        //}
 
         /// <summary>
         ///     Name of the queue that is full.
@@ -67,10 +67,10 @@ namespace Griffin
         ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Read="*AllFiles*" PathDiscovery="*AllFiles*" />
         ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="SerializationFormatter" />
         ///   </PermissionSet>
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("QueueName", _queueName);
-            base.GetObjectData(info, context);
-        }
+        //public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    info.AddValue("QueueName", _queueName);
+        //    base.GetObjectData(info, context);
+        //}
     }
 }

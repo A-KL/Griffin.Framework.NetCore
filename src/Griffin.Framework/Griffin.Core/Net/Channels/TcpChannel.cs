@@ -303,7 +303,7 @@ namespace Griffin.Net.Channels
         {
             try
             {
-                _socket.Close();
+                _socket.Dispose();
                 IsConnected = false;
                 _disconnectAction(this, exception);
             }
@@ -321,7 +321,7 @@ namespace Griffin.Net.Channels
         {
             try
             {
-                _socket.Close();
+                _socket.Dispose();
                 IsConnected = false;
                 _disconnectAction(this, ex ?? CreateException(socketError));
             }
@@ -343,7 +343,7 @@ namespace Griffin.Net.Channels
             {
                 try
                 {
-                    _socket.Close();
+                    _socket.Dispose();
                 }
                 catch
                 {

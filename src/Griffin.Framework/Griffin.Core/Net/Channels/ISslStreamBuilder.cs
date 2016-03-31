@@ -14,6 +14,6 @@ namespace Griffin.Net.Channels
         /// <param name="channel">Channel which will use the stream</param>
         /// <param name="socket">Socket to wrap</param>
         /// <returns>Stream which is ready to be used (must have been validated)</returns>
-        SslStream Build(ITcpChannel channel, Socket socket);
+        //SslStream Build(ITcpChannel channel, Socket socket);
     }
 }

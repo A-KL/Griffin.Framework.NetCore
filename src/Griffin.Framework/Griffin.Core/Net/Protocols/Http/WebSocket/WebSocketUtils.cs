@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Security.Cryptography;
+//using System.Security.Cryptography;
 using System.Text;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
 
 namespace Griffin.Net.Protocols.Http.WebSocket
 {
@@ -16,12 +18,13 @@ namespace Griffin.Net.Protocols.Http.WebSocket
         public static string HashWebSocketKey(string webSocketKey)
         {
             if (webSocketKey == null) throw new ArgumentNullException("webSocketKey");
-            using (var sha1 = new SHA1CryptoServiceProvider())
-            {
-                var bytes = Encoding.UTF8.GetBytes(webSocketKey + _guid);
-                var hash = sha1.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
-            }
+
+            var buffer = CryptographicBuffer.ConvertStringToBinary(webSocketKey + _guid, BinaryStringEncoding.Utf8);
+
+            var hashAlgorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha1);
+            var hashBuffer = hashAlgorithm.HashData(buffer);
+
+            return CryptographicBuffer.EncodeToBase64String(hashBuffer);
         }
 
         /// <summary>

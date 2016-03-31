@@ -96,13 +96,16 @@ namespace Griffin.Net.Protocols.Http.Serializers
                     source.Read(buffer, 0, (int)element.Length);
 
                     // Generate a filename
-                    var originalFileName = element.Filename;
-                    var internetCache = Environment.GetFolderPath(Environment.SpecialFolder.InternetCache);
 
+                    var applicationData = Windows.Storage.ApplicationData.Current;
+                    var temporaryFolder = applicationData.LocalCacheFolder;
+
+                    var originalFileName = element.Filename;
+                    
                     // if the internet path doesn't exist, assume mono and /var/tmp
-                    var path = string.IsNullOrEmpty(internetCache)
+                    var path = string.IsNullOrEmpty(temporaryFolder.Path)
                         ? Path.Combine("var", "tmp")
-                        : Path.Combine(internetCache.Replace("\\\\", "\\"), "tmp");
+                        : Path.Combine(temporaryFolder.Path.Replace("\\\\", "\\"), "tmp");
 
                     element.Filename = Path.Combine(path, Math.Abs(element.Filename.GetHashCode()) + ".tmp");
 

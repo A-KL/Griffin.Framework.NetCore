@@ -102,18 +102,10 @@ namespace Griffin.ApplicationServices
                 throw new InvalidOperationException("Can not stop a thread that have not been started.");
 
             _shutDownEvent.Cancel();
-
+            
             try
             {
-                if (!_workThread.Join(StopWaitTime))
-                {
-                    _workThread.Abort();
-                    Failed(this,
-                        new ApplicationServiceFailedEventArgs(this,
-                            new Exception("Failed to stop thread '" + GetType().FullName +
-                                          "' within the given timespan of " +
-                                          StopWaitTime)));
-                }
+                this._workThread.Wait();
             }
             finally
             {

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Griffin.Core.External.SimpleJson;
 using Griffin.Logging;
 
@@ -31,13 +32,11 @@ namespace Griffin.Signals
         private readonly ILogger _logger = LogManager.GetLogger<SignalSubmitter>();
         private readonly ConcurrentQueue<SignalDTO> _signalsToSend = new ConcurrentQueue<SignalDTO>();
         private readonly ManualResetEvent _submitSignalsEvent = new ManualResetEvent(false);
-        private Thread _thread;
+        private Task _thread;
 
         private SignalSubmitter()
         {
-            _thread = new Thread(PostSignalsThreadFunc);
-            _thread.IsBackground = true;
-            _thread.Start();
+            _thread = Task.Run(() =>  this.PostSignalsThreadFunc());
         }
 
         /// <summary>
@@ -135,7 +134,7 @@ namespace Griffin.Signals
                     if (!_signalsToSend.TryDequeue(out dto))
                     {
                         _submitSignalsEvent.Reset();
-                        Thread.Yield();
+                        //Thread.Yield();
                         if (!_signalsToSend.TryDequeue(out dto))
                             continue;
                     }
@@ -145,12 +144,12 @@ namespace Griffin.Signals
                     var request = (HttpWebRequest) WebRequest.Create(_uri);
                     request.Method = "POST";
                     request.ContentType = "application/json";
-                    request.GetRequestStream().Write(bytes, 0, bytes.Length);
+                    request.GetRequestStreamAsync().Result.Write(bytes, 0, bytes.Length);
 
                     try
                     {
-                        var response = request.GetResponse();
-                        response.Close();
+                        var response = request.GetResponseAsync().Result;
+                        response.Dispose();
                     }
                     catch (WebException)
                     {

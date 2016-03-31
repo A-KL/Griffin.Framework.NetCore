@@ -2,7 +2,10 @@
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
 using Griffin.Logging;
 using Griffin.Net.Protocols.Http.Authentication.Digest;
 using Griffin.Net.Protocols.Http.Messages;
@@ -249,9 +252,14 @@ namespace Griffin.Net.Protocols.Http.Authentication
         /// <returns></returns>
         public static string GetMd5HashBinHex(string toBeHashed)
         {
-            var hashAlgorithm = MD5.Create();
-            var hash = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(toBeHashed));
-            return string.Concat(hash.Select(b => b.ToString("x2")).ToArray());
+            var buffer = CryptographicBuffer.ConvertStringToBinary(toBeHashed, BinaryStringEncoding.Utf8);
+
+            var hashAlgorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
+            var hashBuffer = hashAlgorithm.HashData(buffer);
+
+           // return CryptographicBuffer.EncodeToBase64String(hashBuffer);
+
+            return string.Concat(hashBuffer.ToArray().Select(b => b.ToString("x2")).ToArray());
         }
     }
 }
