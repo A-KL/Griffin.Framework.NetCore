@@ -1319,9 +1319,9 @@ namespace Griffin.Core.External.SimpleJson
             if (type == typeof(Guid) && string.IsNullOrEmpty(str))
                 return default(Guid);
 
-            if (type.IsEnum)
+            if (type.GetTypeInfo().IsEnum)
             {
-                if (value.GetType().IsPrimitive)
+                if (value.GetType().GetTypeInfo().IsPrimitive)
                 {
                     var value2 = Convert.ChangeType(value, Enum.GetUnderlyingType(type));
                     if (!Enum.IsDefined(type, value2))

@@ -282,13 +282,13 @@ namespace Griffin.Signals
                 if (IsRaised)
                     return false;
 
-                var callFrame = new StackFrame(1);
-                var caller = callFrame.GetMethod().DeclaringType.FullName + "." + callFrame.GetMethod().Name;
+               // var callFrame = new StackFrame(1);
+               // var caller = callFrame.GetMethod().DeclaringType.FullName + "." + callFrame.GetMethod().Name;
                 RaisedSinceUtc = DateTime.UtcNow;
                 IdleSinceUtc = DateTime.MinValue;
                 IsRaised = true;
                 _message = string.Format(reason, reasonFormatters);
-                TriggerRaised(_message, caller);
+               // TriggerRaised(_message, caller);
             }
 
             return true;
@@ -319,13 +319,13 @@ namespace Griffin.Signals
                 if (IsRaised)
                     return false;
 
-                var callFrame = new StackFrame(1);
-                var caller = callFrame.GetMethod().DeclaringType.FullName + "." + callFrame.GetMethod().Name;
+                //var callFrame = new StackFrame(1);
+               // var caller = callFrame.GetMethod().DeclaringType.FullName + "." + callFrame.GetMethod().Name;
                 RaisedSinceUtc = DateTime.UtcNow;
                 IdleSinceUtc = DateTime.MinValue;
                 IsRaised = true;
                 _message = reason;
-                TriggerRaised(reason, caller, exception);
+              //  TriggerRaised(reason, caller, exception);
                 return true;
             }
         }
@@ -367,9 +367,9 @@ namespace Griffin.Signals
                 if (!IsRaised)
                     return false;
 
-                var callFrame = new StackFrame(1);
-                var caller = callFrame.GetMethod().DeclaringType.FullName + "." + callFrame.GetMethod().Name;
-                TriggerSuppressed(caller);
+               // var callFrame = new StackFrame(1);
+               // var caller = callFrame.GetMethod().DeclaringType.FullName + "." + callFrame.GetMethod().Name;
+               // TriggerSuppressed(caller);
                 IsRaised = false;
                 _raiseCountSinceLastReset = 0;
                 RaisedSinceUtc = DateTime.MinValue;
