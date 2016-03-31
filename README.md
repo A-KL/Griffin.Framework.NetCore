@@ -3,49 +3,37 @@
 
 ## Example HTTP listener
 
-	internal class Program
+	class Program2
 	{
-		public static void RunDemo()
-		{
-			var server = new MessagingServer(new MyHttpServiceFactory(),
-												new MessagingServerConfiguration(new HttpMessageFactory()));
-			server.Start(new IPEndPoint(IPAddress.Parse("192.168.1.12"), 8080));
-		}
-	}
+	    static void Main(string[] args)
+	    {
+	        var listener = new HttpListener();
+	        listener.MessageReceived = OnMessage;
+	        listener.BodyDecoder = new CompositeBodyDecoder();
+	        listener.Start(IPAddress.Parse("192.168.1.1"), 8080);
 	 
-	// factory
-	public class MyHttpServiceFactory : IServiceFactory
-	{
-		public IServerService CreateClient(EndPoint remoteEndPoint)
-		{
-			return new MyHttpService();
-		}
-	}
+	        Console.ReadLine();
+	    }
 	 
-	// and the handler
-	public class MyHttpService : HttpService
-	{
-		private static readonly BufferSliceStack Stack = new BufferSliceStack(50, 32000);
 	 
-		public MyHttpService()
-			: base(Stack)
-		{
-		}
+	    private static void OnMessage(ITcpChannel channel, object message)
+	    {
+	        var request = (HttpRequestBase)message;
+	        var response = request.CreateResponse();
 	 
-		public override void Dispose()
-		{
-		}
+	        if (request.Uri.AbsolutePath == "/favicon.ico")
+	        {
+	            response.StatusCode = 404;
+	            channel.Send(response);
+	            return;
+	        }
 	 
-		public override void OnRequest(IRequest request)
-		{
-			var response = request.CreateResponse(HttpStatusCode.OK, "Welcome");
+	        var msg = Encoding.UTF8.GetBytes("Hello world");
+	        response.Body = new MemoryStream(msg);
+	        response.ContentType = "text/plain";
+	        channel.Send(response);
 	 
-			response.Body = new MemoryStream();
-			response.ContentType = "text/plain";
-			var buffer = Encoding.UTF8.GetBytes("Hello world");
-			response.Body.Write(buffer, 0, buffer.Length);
-			response.Body.Position = 0;
-	 
-			Send(response);
-		}
+	        if (request.HttpVersion == "HTTP/1.0")
+	            channel.Close();
+	    }
 	}
