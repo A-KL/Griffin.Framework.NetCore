@@ -9,16 +9,14 @@
 	    {
 	        var listener = new HttpListener();
 	        listener.MessageReceived = OnMessage;
-	        listener.BodyDecoder = new CompositeBodyDecoder();
-	        listener.Start(IPAddress.Parse("192.168.1.1"), 8080);
+	        listener.Start(IPAddress.Parse("192.168.1.12"), 8080);
 	 
 	        Console.ReadLine();
 	    }
-	 
-	 
+
 	    private static void OnMessage(ITcpChannel channel, object message)
 	    {
-	        var request = (HttpRequestBase)message;
+	        var request = (IHttpRequest)message;
 	        var response = request.CreateResponse();
 	 
 	        if (request.Uri.AbsolutePath == "/favicon.ico")
