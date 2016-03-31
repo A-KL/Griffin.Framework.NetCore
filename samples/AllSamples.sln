@@ -1,0 +1,69 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServerDemo", "WebServerDemo\WebServerDemo.csproj", "{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".libs", ".libs", "{14D26A06-2F19-4A1F-B5AB-72B624333738}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Griffin.Core", "..\src\Griffin.Framework\Griffin.Core\Griffin.Core.csproj", "{7DD315C1-2C05-4811-BD87-C43D8082CFAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|Any CPU.Build.0 = Debug|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|Any CPU.Deploy.0 = Debug|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|ARM.ActiveCfg = Debug|ARM
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|ARM.Build.0 = Debug|ARM
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|ARM.Deploy.0 = Debug|ARM
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|x64.ActiveCfg = Debug|x64
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|x64.Build.0 = Debug|x64
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|x64.Deploy.0 = Debug|x64
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|x86.ActiveCfg = Debug|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|x86.Build.0 = Debug|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Debug|x86.Deploy.0 = Debug|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|Any CPU.ActiveCfg = Release|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|ARM.ActiveCfg = Release|ARM
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|ARM.Build.0 = Release|ARM
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|ARM.Deploy.0 = Release|ARM
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|x64.ActiveCfg = Release|x64
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|x64.Build.0 = Release|x64
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|x64.Deploy.0 = Release|x64
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|x86.ActiveCfg = Release|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|x86.Build.0 = Release|x86
+		{EA0C9F2F-9F73-4DF8-B5FC-8E00B875DAA8}.Release|x86.Deploy.0 = Release|x86
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|ARM.ActiveCfg = Debug|ARM
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|ARM.Build.0 = Debug|ARM
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|x64.ActiveCfg = Debug|x64
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|x64.Build.0 = Debug|x64
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|x86.ActiveCfg = Debug|x86
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Debug|x86.Build.0 = Debug|x86
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|ARM.ActiveCfg = Release|ARM
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|ARM.Build.0 = Release|ARM
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|x64.ActiveCfg = Release|x64
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|x64.Build.0 = Release|x64
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|x86.ActiveCfg = Release|x86
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7DD315C1-2C05-4811-BD87-C43D8082CFAC} = {14D26A06-2F19-4A1F-B5AB-72B624333738}
+	EndGlobalSection
+EndGlobal
