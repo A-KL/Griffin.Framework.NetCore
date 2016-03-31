@@ -17,8 +17,7 @@ namespace WebServerDemo
 
             var listener = new HttpListener();
             listener.MessageReceived = OnMessage;
-            listener.Start(IPAddress.Parse(GetLocalIp()), 8080);
-
+            listener.Start(IPAddress.Parse(GetLocalIp()), 8000);
         }
 
         private static void OnMessage(ITcpChannel channel, object message)
