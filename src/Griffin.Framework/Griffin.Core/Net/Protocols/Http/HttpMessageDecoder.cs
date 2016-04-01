@@ -186,23 +186,29 @@ namespace Griffin.Net.Protocols.Http
         private void TriggerMessageReceived(HttpMessage message)
         {
             var request = message as HttpRequest;
+
             if (_messageSerializer != null && request != null)
             {
                 if (message.Body != null && message.Body.Length > 0)
                 {
-                    var result = _messageSerializer.Deserialize(message.Headers["Content-Type"], message.Body);
-                    if (result == null)
-                        throw new BadRequestException("Unsupported content-type: " + message.ContentType);
+                    var formAndFiles = _messageSerializer.Deserialize<FormAndFilesResult>(message.Headers["Content-Type"], message.Body);
 
-                    var formAndFiles = result as FormAndFilesResult;
+                    //if (formAndFiles == null)
+                    //{
+                    //    throw new BadRequestException("Unsupported content-type: " + message.ContentType);
+                    //}
+
                     if (formAndFiles != null)
                     {
                         request.Form = formAndFiles.Form;
                         request.Files = formAndFiles.Files;
                     }
                     else
-                        throw new HttpException(500, "Unknown decoder result: " + result);
+                    {
+                        throw new HttpException(500, "Unknown decoder result: " + formAndFiles);
+                    }
                 }
+
                 var cookies = request.Headers["Cookie"];
                 if (cookies != null)
                 {

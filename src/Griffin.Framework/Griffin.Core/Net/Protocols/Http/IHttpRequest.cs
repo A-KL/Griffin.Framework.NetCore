@@ -46,5 +46,11 @@ namespace Griffin.Net.Protocols.Http
         /// </summary>
         /// <returns>Response</returns>
         IHttpResponse CreateResponse();
+
+        /// <summary>
+        /// Create a response for this request.
+        /// </summary>
+        /// <returns>Response</returns>
+        IHttpResponse CreateResponse(HttpStatusCode status, string reason);
     }
 }

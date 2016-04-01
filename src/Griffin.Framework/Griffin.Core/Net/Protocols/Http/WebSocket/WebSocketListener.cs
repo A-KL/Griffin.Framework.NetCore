@@ -30,6 +30,7 @@ namespace Griffin.Net.Protocols.Http.WebSocket
                 () => new WebSocketEncoder());
 
             Configure(config);
+            _webSocketMessageReceived = delegate { };
         }
 
         /// <summary>

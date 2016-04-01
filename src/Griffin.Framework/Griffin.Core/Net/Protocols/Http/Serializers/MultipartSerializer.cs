@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using Windows.Storage;
 using Griffin.Net.Protocols.Http.Messages;
 using Griffin.Net.Protocols.Serializers;
 using Griffin.Net.Protocols.Serializers.Mono;
@@ -18,8 +20,15 @@ namespace Griffin.Net.Protocols.Http.Serializers
     ///         <c>/var/tmp/</c> is used if the special folder is not found.
     ///     </para>
     /// </remarks>
-    public class MultipartSerializer : IMessageSerializer
+    public class MultipartSerializer : IMessageSerializer<FormAndFilesResult>
     {
+        private IStorageFolder rootFolder;
+
+        public MultipartSerializer(IStorageFolder rootFolder)
+        {
+            this.rootFolder = rootFolder;
+        }
+
         /// <summary>
         ///     form-data
         /// </summary>
@@ -33,7 +42,9 @@ namespace Griffin.Net.Protocols.Http.Serializers
         /// <summary>
         /// Content types that this serializer supports.
         /// </summary>
-        public string[] SupportedContentTypes { get { return new[] {FormData, MimeType}; }}
+        public string[] SupportedContentTypes { get { return new[] { FormData, MimeType }; } }
+
+        public string Boundary { get; } = "--boundary";
 
         /// <summary>
         /// Serialize an object to the stream.
@@ -43,9 +54,29 @@ namespace Griffin.Net.Protocols.Http.Serializers
         /// <param name="contentType">If you include the type name to it after the format name, for instance <c>json;YourApp.DTO.User,YourApp</c></param>
         /// <returns>Content name (will be passed to the <see cref="IMessageSerializer.Deserialize"/> method in the other end)</returns>
         /// <exception cref="SerializationException">Deserialization failed</exception>
-        public void Serialize(object source, Stream destination, out string contentType)
+        public void Serialize(FormAndFilesResult source, Stream destination, out string contentType)
         {
-            throw new NotSupportedException();
+            if (source == null) throw new ArgumentNullException("source");
+            if (destination == null) throw new ArgumentNullException("destination");
+
+            var newLine = Encoding.UTF8.GetBytes("\r\n");
+
+            foreach (var file in source.Files)
+            {
+                using (var fileStreamInfo = this.rootFolder.OpenStreamForReadAsync(file.OriginalFileName).Result)
+                {
+                    var header = $"--{Boundary}\r\nContent-Type: {file.ContentType}\r\nContent-Length: {fileStreamInfo.Length}\r\n\r\n";
+                    var headerData = Encoding.UTF8.GetBytes(header);
+
+                    destination.Write(headerData, 0, headerData.Length);
+
+                    fileStreamInfo.CopyToAsync(destination).Wait();
+                }
+
+                destination.Write(newLine, 0, newLine.Length);
+            }
+
+            contentType = source.Files.First().ContentType;
         }
 
         /// <summary>
@@ -55,7 +86,7 @@ namespace Griffin.Net.Protocols.Http.Serializers
         /// <param name="source">Stream that contains the object to deserialize.</param>
         /// <returns>Created object</returns>
         /// <exception cref="SerializationException">Deserialization failed</exception>
-        public object Deserialize(string contentType, Stream source)
+        public FormAndFilesResult Deserialize(string contentType, Stream source)
         {
             if (contentType == null) throw new ArgumentNullException("contentType");
             if (source == null) throw new ArgumentNullException("source");
@@ -79,6 +110,7 @@ namespace Griffin.Net.Protocols.Http.Serializers
 
             var multipart = new HttpMultipart(source, boundary.Value, encoding);
             HttpMultipart.Element element;
+
             while ((element = multipart.ReadNextElement()) != null)
             {
                 if (string.IsNullOrEmpty(element.Name))
@@ -101,7 +133,7 @@ namespace Griffin.Net.Protocols.Http.Serializers
                     var temporaryFolder = applicationData.LocalCacheFolder;
 
                     var originalFileName = element.Filename;
-                    
+
                     // if the internet path doesn't exist, assume mono and /var/tmp
                     var path = string.IsNullOrEmpty(temporaryFolder.Path)
                         ? Path.Combine("var", "tmp")
@@ -114,7 +146,9 @@ namespace Griffin.Net.Protocols.Http.Serializers
                         element.Filename = Path.Combine(path, Math.Abs(element.Filename.GetHashCode() + 1) + ".tmp");
 
                     if (!Directory.Exists(path))
+                    {
                         Directory.CreateDirectory(path);
+                    }                    
 
                     File.WriteAllBytes(element.Filename, buffer);
 
@@ -136,7 +170,6 @@ namespace Griffin.Net.Protocols.Http.Serializers
                     result.Form.Add(Uri.UnescapeDataString(element.Name), encoding.GetString(buffer));
                 }
             }
-
 
             return result;
         }

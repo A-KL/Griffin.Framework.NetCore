@@ -152,6 +152,17 @@ namespace Griffin.Net.Protocols.Http
             return response;
         }
 
+        public IHttpResponse CreateResponse(HttpStatusCode status, string reason)
+        {
+            var response = new HttpResponse(status, reason, HttpVersion);
+            var pipeline = Headers[PipelineIndexKey];
+            if (pipeline != null)
+            {
+                response.Headers[PipelineIndexKey] = pipeline;
+            }
+            return response;
+        }
+
         IHttpResponse IHttpRequest.CreateResponse()
         {
             var response = new HttpResponse(200, "OK", HttpVersion);
