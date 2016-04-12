@@ -34,7 +34,7 @@ namespace Griffin.Net.Protocols.Serializers
     /// You can use <see cref="HttpHeaderValue"/> if you want to extract the actual content type and it's parameters.
     /// </para>
     /// </remarks>
-    public interface IMessageSerializer<T>
+    public interface IMessageSerializer
     {
         /// <summary>
         ///     Content types that this serializer supports.
@@ -51,7 +51,7 @@ namespace Griffin.Net.Protocols.Serializers
         /// <param name="source">Stream that contains the object to deserialize.</param>
         /// <returns>Created object</returns>
         /// <exception cref="SerializationException">Deserialization failed</exception>
-        T Deserialize(string contentType, Stream source);
+        object Deserialize(string contentType, Stream source);
 
         /// <summary>
         ///     Serialize an object to the stream.
@@ -64,6 +64,6 @@ namespace Griffin.Net.Protocols.Serializers
         /// </param>
         /// <returns>Content name (will be passed to the <see cref="Deserialize" /> method in the other end)</returns>
         /// <exception cref="SerializationException">Deserialization failed</exception>
-        void Serialize(T source, Stream destination, out string contentType);
+        void Serialize(object source, Stream destination, out string contentType);
     }
 }

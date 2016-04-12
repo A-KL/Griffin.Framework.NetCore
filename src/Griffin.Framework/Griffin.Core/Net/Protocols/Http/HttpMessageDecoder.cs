@@ -191,7 +191,7 @@ namespace Griffin.Net.Protocols.Http
             {
                 if (message.Body != null && message.Body.Length > 0)
                 {
-                    var formAndFiles = _messageSerializer.Deserialize<FormAndFilesResult>(message.Headers["Content-Type"], message.Body);
+                    var formAndFiles = (FormAndFilesResult)_messageSerializer.Deserialize(message.Headers["Content-Type"], message.Body);
 
                     //if (formAndFiles == null)
                     //{

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+
 using Windows.Storage;
 using Griffin.Net.Protocols.Http.Messages;
 using Griffin.Net.Protocols.Serializers;
@@ -20,11 +20,11 @@ namespace Griffin.Net.Protocols.Http.Serializers
     ///         <c>/var/tmp/</c> is used if the special folder is not found.
     ///     </para>
     /// </remarks>
-    public class MultipartSerializer : IMessageSerializer<FormAndFilesResult>
+    public class MultipartSerializer : IMessageSerializer
     {
-        private IStorageFolder rootFolder;
+        private readonly IStorageFolder rootFolder;
 
-        public MultipartSerializer(IStorageFolder rootFolder)
+        public MultipartSerializer(IStorageFolder rootFolder = null)
         {
             this.rootFolder = rootFolder;
         }
@@ -54,8 +54,10 @@ namespace Griffin.Net.Protocols.Http.Serializers
         /// <param name="contentType">If you include the type name to it after the format name, for instance <c>json;YourApp.DTO.User,YourApp</c></param>
         /// <returns>Content name (will be passed to the <see cref="IMessageSerializer.Deserialize"/> method in the other end)</returns>
         /// <exception cref="SerializationException">Deserialization failed</exception>
-        public void Serialize(FormAndFilesResult source, Stream destination, out string contentType)
+        public void Serialize(object src, Stream destination, out string contentType)
         {
+            var source = (FormAndFilesResult)src;
+
             if (source == null) throw new ArgumentNullException("source");
             if (destination == null) throw new ArgumentNullException("destination");
 
@@ -86,7 +88,7 @@ namespace Griffin.Net.Protocols.Http.Serializers
         /// <param name="source">Stream that contains the object to deserialize.</param>
         /// <returns>Created object</returns>
         /// <exception cref="SerializationException">Deserialization failed</exception>
-        public FormAndFilesResult Deserialize(string contentType, Stream source)
+        public object Deserialize(string contentType, Stream source)
         {
             if (contentType == null) throw new ArgumentNullException("contentType");
             if (source == null) throw new ArgumentNullException("source");
