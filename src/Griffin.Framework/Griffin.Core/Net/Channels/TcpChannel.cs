@@ -199,7 +199,7 @@ namespace Griffin.Net.Channels
         {
             if (_socket == null || !_socket.Connected)
                 throw new SocketException((int) SocketError.NotConnected);
-
+            
             _sendLock.Wait();
             _messagePendingSendOperation = message;
             _encoder.Prepare(message);
