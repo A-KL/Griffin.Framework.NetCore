@@ -63,7 +63,7 @@ namespace Griffin.Net.Protocols.Serializers
         ///     <c>json;type=YourApp.DTO.User-YourApp</c>
         /// </param>
         /// <returns>Content name (will be passed to the <see cref="Deserialize" /> method in the other end)</returns>
-        /// <exception cref="SerializationException">Deserialization failed</exception>
+        /// <exception cref="SerializationException">Serialization failed</exception>
         void Serialize(object source, Stream destination, out string contentType);
     }
 }

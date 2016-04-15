@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using Griffin.Net.Protocols.Http.Serializers;
 
@@ -43,7 +42,7 @@ namespace Griffin.Net.Protocols.Serializers
         ///     <c>json;YourApp.DTO.User,YourApp</c>
         /// </param>
         /// <returns>Content name (will be passed to the <see cref="IMessageSerializer.Deserialize" /> method in the other end)</returns>
-        /// <exception cref="SerializationException">Deserialization failed</exception>
+        /// <exception cref="System.Runtime.Serialization.SerializationException">Deserialization failed</exception>
         public void Serialize(object source, Stream destination, out string contentType)
         {
             throw new NotSupportedException("We can currently not encode outbound message bodies.");
@@ -63,7 +62,7 @@ namespace Griffin.Net.Protocols.Serializers
         /// </param>
         /// <param name="source">Stream that contains the object to deserialize.</param>
         /// <returns>Created object</returns>
-        /// <exception cref="SerializationException">Deserialization failed</exception>
+        /// <exception cref="System.Runtime.Serialization.SerializationException">Deserialization failed</exception>
         public object Deserialize(string contentType, Stream source)
         {
             IMessageSerializer decoder;

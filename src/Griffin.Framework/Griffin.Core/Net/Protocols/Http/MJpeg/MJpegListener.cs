@@ -38,9 +38,9 @@ namespace Griffin.Net.Protocols.Http.MJpeg
             var request = msg as IHttpRequest;
             if (request != null)
             {
-                var args = new LiveStreamRequestEventArgs(source, request);
+               // var args = new LiveStreamRequestEventArgs(source, request);
 
-                this.LiveStreamRequest(this, args);
+               // this.LiveStreamRequest(this, args);
 
                 //args.ContentReadFunc()
 
@@ -50,6 +50,6 @@ namespace Griffin.Net.Protocols.Http.MJpeg
             base.OnMessage(source, msg);
         }
 
-        public EventHandler<LiveStreamRequestEventArgs> LiveStreamRequest = delegate { };
+       // public EventHandler<LiveStreamRequestEventArgs> LiveStreamRequest = delegate { };
     }
 }

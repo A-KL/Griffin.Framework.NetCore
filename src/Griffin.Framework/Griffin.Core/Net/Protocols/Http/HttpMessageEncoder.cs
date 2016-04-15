@@ -12,12 +12,13 @@ namespace Griffin.Net.Protocols.Http
         private readonly byte[] _buffer = new byte[65535];
         private int _bytesToSend;
         private bool _isHeaderSent;
-        private HttpMessage _message;
         private int _offset;
         private readonly MemoryStream _stream;
         private int _totalAmountToSend;
         private readonly StreamWriter _writer;
         private object _resetLock = new object();
+
+        protected IHttpMessage _message;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpMessageEncoder"/> class.

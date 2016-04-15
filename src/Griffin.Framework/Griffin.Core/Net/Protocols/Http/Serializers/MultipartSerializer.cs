@@ -22,11 +22,11 @@ namespace Griffin.Net.Protocols.Http.Serializers
     /// </remarks>
     public class MultipartSerializer : IMessageSerializer
     {
-        private readonly IStorageFolder rootFolder;
+       // private readonly IStorageFolder rootFolder;
 
         public MultipartSerializer(IStorageFolder rootFolder = null)
         {
-            this.rootFolder = rootFolder;
+           // this.rootFolder = rootFolder;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Griffin.Net.Protocols.Http.Serializers
         /// </summary>
         public string[] SupportedContentTypes { get { return new[] { FormData, MimeType }; } }
 
-        public string Boundary { get; } = "--boundary";
+       // public string Boundary { get; } = "--boundary";
 
         /// <summary>
         /// Serialize an object to the stream.
@@ -56,29 +56,30 @@ namespace Griffin.Net.Protocols.Http.Serializers
         /// <exception cref="SerializationException">Deserialization failed</exception>
         public void Serialize(object src, Stream destination, out string contentType)
         {
-            var source = (FormAndFilesResult)src;
+            contentType = null;
+            //var source = (FormAndFilesResult)src;
 
-            if (source == null) throw new ArgumentNullException("source");
-            if (destination == null) throw new ArgumentNullException("destination");
+            //if (source == null) throw new ArgumentNullException("source");
+            //if (destination == null) throw new ArgumentNullException("destination");
 
-            var newLine = Encoding.UTF8.GetBytes("\r\n");
+            //var newLine = Encoding.UTF8.GetBytes("\r\n");
 
-            foreach (var file in source.Files)
-            {
-                using (var fileStreamInfo = this.rootFolder.OpenStreamForReadAsync(file.OriginalFileName).Result)
-                {
-                    var header = $"--{Boundary}\r\nContent-Type: {file.ContentType}\r\nContent-Length: {fileStreamInfo.Length}\r\n\r\n";
-                    var headerData = Encoding.UTF8.GetBytes(header);
+            //foreach (var file in source.Files)
+            //{
+            //    using (var fileStreamInfo = this.rootFolder.OpenStreamForReadAsync(file.OriginalFileName).Result)
+            //    {
+            //        var header = $"--{Boundary}\r\nContent-Type: {file.ContentType}\r\nContent-Length: {fileStreamInfo.Length}\r\n\r\n";
+            //        var headerData = Encoding.UTF8.GetBytes(header);
 
-                    destination.Write(headerData, 0, headerData.Length);
+            //        destination.Write(headerData, 0, headerData.Length);
 
-                    fileStreamInfo.CopyToAsync(destination).Wait();
-                }
+            //        fileStreamInfo.CopyToAsync(destination).Wait();
+            //    }
 
-                destination.Write(newLine, 0, newLine.Length);
-            }
+            //    destination.Write(newLine, 0, newLine.Length);
+            //}
 
-            contentType = source.Files.First().ContentType;
+            //contentType = source.Files.First().ContentType;
         }
 
         /// <summary>
