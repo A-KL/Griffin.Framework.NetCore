@@ -15,6 +15,6 @@ namespace Griffin.Core.Net.Protocols.Http.MJpeg
         {
         }
 
-        public IFramesSource StreamSource { get; }
+        public IFramesSource StreamSource { get; set; }
     }
 }

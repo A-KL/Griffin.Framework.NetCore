@@ -52,7 +52,6 @@ namespace Griffin.Net.Protocols.Http
                 if (_message.Body.Position == _message.Body.Length)
                     _message.Body.Position = 0;
             }
-
         }
 
         /// <summary>

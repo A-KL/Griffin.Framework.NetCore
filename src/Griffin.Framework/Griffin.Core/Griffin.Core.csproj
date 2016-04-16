@@ -201,6 +201,7 @@
     <Compile Include="Net\Protocols\Http\MJpeg\IFramesSource.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\IHttpStreamResponse.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\IImageFrame.cs" />
+    <Compile Include="Net\Protocols\Http\MJpeg\ImageFileFrame.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\LiveStreamMessage.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\LiveStreamRequestEventArgs.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\MJpegEncoder.cs" />
