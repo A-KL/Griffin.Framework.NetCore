@@ -91,11 +91,8 @@ namespace Griffin.Net.Protocols.Http
             catch (Exception ex)
             {
             }
-
         }
-
-
-
+        
         /// <summary>
         /// Receive a new message from the specified client
         /// </summary>
