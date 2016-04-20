@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
 using Griffin.Core.Net.Protocols.Http.MJpeg;
 using Griffin.Net.Channels;
 
@@ -19,13 +17,13 @@ namespace Griffin.Net.Protocols.Http.MJpeg
 
         private bool isHeaderSent;
 
-        //private object _resetLock = new object();
-
         private IHttpStreamResponse message;
 
-        private IEnumerator<IImageFrame> framesEnumerator;
-
         private string boundary { get; } = "boundary";
+
+        private readonly object frameSync = new object();
+
+        private IImageFrame currentFrame;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MJpegEncoder"/> class.
@@ -33,7 +31,7 @@ namespace Griffin.Net.Protocols.Http.MJpeg
         public MJpegEncoder()
         {
             this.stream = new MemoryStream(65535);
-           // this.stream.SetLength(0);
+            // this.stream.SetLength(0);
             this.writer = new StreamWriter(this.stream);
         }
 
@@ -56,19 +54,20 @@ namespace Griffin.Net.Protocols.Http.MJpeg
             this.message.Headers["Content-Length"] = string.Empty;
             this.message.Headers["Content-Type"] = "multipart/x-mixed-replace;boundary=" + boundary;
 
-            this.framesEnumerator = this.message.StreamSource.Frames.GetEnumerator();
-            this.framesEnumerator.MoveNext();
+            this.message.StreamSource.FrameReceived += this.StreamSource_FrameReceived;
+        }
+
+        private void StreamSource_FrameReceived(object sender, FrameReceivedEventArgs e)
+        {
+            this.currentFrame = e.IsLastFrame ? null : e.Frame;
         }
 
         public void Send(ISocketBuffer buffer)
         {
-            // last send operation did not send all bytes enqueued in the buffer
-            // so let's just continue until doing next message
-            //if (bytesToSend > 0)
-            //{
-            //    buffer.SetBuffer(_buffer, offset, _bytesToSend);
-            //    return;
-            //}
+            if (this.currentFrame == null)
+            {
+                return;
+            }
 
             this.stream.Position = 0;
             this.stream.SetLength(0);
@@ -81,21 +80,22 @@ namespace Griffin.Net.Protocols.Http.MJpeg
                 {
                     if (string.IsNullOrEmpty(header.Key))
                     {
-                        continue;                        
+                        continue;
                     }
 
                     this.writer.Write("{0}: {1}\r\n", header.Key, header.Value);
                 }
 
                 this.writer.Write("\r\n");
-                
+
 
                 this.isHeaderSent = true;
                 buffer.UserToken = this.message;
             }
 
             // Write frame
-            var frame = this.framesEnumerator.Current;
+
+            var frame = this.currentFrame;
 
             // Frame header
             var frameHeader = $"--{this.boundary}\r\nContent-Type: image/jpeg\r\nContent-Length: {frame.Data.Length}\r\n\r\n";
@@ -111,37 +111,13 @@ namespace Griffin.Net.Protocols.Http.MJpeg
 
             //if (this.stream.TryGetBuffer(out streamBuffer))
             //{
-                buffer.SetBuffer(streamBuffer, 0, streamBuffer.Length);
-            //}
-
-            Task.Delay(1000).Wait();
-
-            //using (var stream = new MemoryStream())
-            //{
-            //    stream.SetLength(0);
-
-            //    using (var writer = new StreamWriter(stream))
-            //    {
-            //        foreach (var imageFrame in this.source.Frames)
-            //        {
-            //            //writer.WriteLine();
-
-
-
-            //            writer.Flush();
-
-            //            this.buffer = stream.ToArray();
-            //            this.bytesToSend = this.buffer.Length;
-
-            //            buffer.SetBuffer(this.buffer, 0, this.bytesToSend);
-            //        }
-            //    }
+            buffer.SetBuffer(streamBuffer, 0, streamBuffer.Length);
             //}
         }
 
         public bool OnSendCompleted(int bytesTransferred)
         {
-            return !this.framesEnumerator.MoveNext();
+            return this.currentFrame == null;
         }
 
         public void Clear()

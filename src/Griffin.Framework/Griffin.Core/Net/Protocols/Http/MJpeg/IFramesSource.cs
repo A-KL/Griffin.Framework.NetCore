@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using Griffin.Net.Protocols.Http.MJpeg;
 
 namespace Griffin.Core.Net.Protocols.Http.MJpeg
 {
     public interface IFramesSource
     {
-        IEnumerable<IImageFrame> Frames { get; }
+        event EventHandler<FrameReceivedEventArgs> FrameReceived;
     }
 }
