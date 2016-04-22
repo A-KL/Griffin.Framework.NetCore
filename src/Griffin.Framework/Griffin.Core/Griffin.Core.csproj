@@ -201,7 +201,8 @@
     <Compile Include="Net\Protocols\Http\MJpeg\IFramesSource.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\IHttpStreamResponse.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\IImageFrame.cs" />
-    <Compile Include="Net\Protocols\Http\MJpeg\FrameReceivedEventArgs.cs" />
+    <Compile Include="Net\Protocols\Http\MJpeg\LiveStreamMessage.cs" />
+    <Compile Include="Net\Protocols\Http\MJpeg\LiveStreamRequestEventArgs.cs" />
     <Compile Include="Net\Protocols\Http\MJpeg\MJpegEncoder.cs" />
     <Compile Include="Net\Protocols\Http\WebSocket\IWebSocketMessage.cs" />
     <Compile Include="Net\Protocols\Http\WebSocket\WebSocketClientConnectEventArgs.cs" />
