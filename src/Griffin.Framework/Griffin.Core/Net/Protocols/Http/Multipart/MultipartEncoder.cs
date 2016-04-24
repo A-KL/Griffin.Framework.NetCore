@@ -1,35 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Griffin.Core.Net.Protocols.Http.MJpeg;
-using Griffin.Net.Channels;
-
-namespace Griffin.Net.Protocols.Http.MJpeg
+﻿namespace Griffin.Core.Net.Protocols.Http.Multipart
 {
-    public class MJpegEncoder : IMessageEncoder
+    using System;
+    using System.IO;
+    using Griffin.Net;
+    using Griffin.Net.Channels;
+
+    public class MultipartEncoder : IMessageEncoder
     {
+        private readonly MultipartStream multipartStream;
         private readonly MemoryStream stream;
         private readonly StreamWriter writer;
-
-        private int bytesToSend;
 
         private bool isHeaderSent;
 
         private IHttpStreamResponse message;
 
-        private IEnumerator<IImageFrame> framesEnumerator;
-
-        private string boundary { get; } = "boundary";
+        private bool nextFrameAvailable;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MJpegEncoder"/> class.
+        /// Initializes a new instance of the <see cref="MultipartEncoder"/> class.
         /// </summary>
-        public MJpegEncoder()
+        public MultipartEncoder()
         {
-            this.stream = new MemoryStream(65535);
-           this.stream.SetLength(0);
+            this.stream = new MemoryStream();
+            this.stream.SetLength(0);
+
             this.writer = new StreamWriter(this.stream);
+            this.multipartStream = new MultipartStream(this.stream);
         }
 
         public void Prepare(object message)
@@ -49,10 +46,7 @@ namespace Griffin.Net.Protocols.Http.MJpeg
             }
 
             this.message.Headers["Content-Length"] = string.Empty;
-            this.message.Headers["Content-Type"] = "multipart/x-mixed-replace;boundary=" + boundary;
-
-            this.framesEnumerator = this.message.StreamSource.Frames.GetEnumerator();
-            this.framesEnumerator.MoveNext();
+            this.message.Headers["Content-Type"] = "multipart/x-mixed-replace;boundary=" + this.multipartStream.Boundary;
         }
 
         public void Send(ISocketBuffer buffer)
@@ -68,30 +62,33 @@ namespace Griffin.Net.Protocols.Http.MJpeg
                 {
                     if (string.IsNullOrEmpty(header.Key))
                     {
-                        continue;                        
+                        continue;
                     }
 
                     this.writer.Write("{0}: {1}\r\n", header.Key, header.Value);
                 }
 
                 this.writer.Write("\r\n");
-                
+
 
                 this.isHeaderSent = true;
                 buffer.UserToken = this.message;
+                this.writer.Flush();
             }
 
             // Write frame
-            var frame = this.framesEnumerator.Current;
+            //var frame = this.framesEnumerator.Current;
 
             // Frame header
-            var frameHeader = $"--{this.boundary}\r\nContent-Type: image/jpeg\r\nContent-Length: {frame.Data.Length}\r\n\r\n";
-            this.writer.Write(frameHeader);
+            //this.multipartStream.Write();
 
-            this.writer.Flush();
+            //var frameHeader = $"--{this.boundary}\r\nContent-Type: image/jpeg\r\nContent-Length: {frame.DataSize}\r\n\r\n";
+            //this.writer.Write(frameHeader);
 
-            // Frame body
-            this.stream.Write(frame.Data.ToArray(), 0, (int)frame.Data.Length);
+            // Frame body & header
+            // this.multipartStream.Write(frame.Data.ToArray(), 0, (int)frame.DataSize);
+
+            this.nextFrameAvailable = this.message.StreamSource.WriteNextFrame(this.multipartStream);
 
             // Send
             var streamBuffer = this.stream.ToArray();
@@ -101,14 +98,13 @@ namespace Griffin.Net.Protocols.Http.MJpeg
 
         public bool OnSendCompleted(int bytesTransferred)
         {
-            return !this.framesEnumerator.MoveNext();
+            return !this.nextFrameAvailable;
         }
 
         public void Clear()
-        {
-            bytesToSend = 0;
-            isHeaderSent = false;
-            stream.SetLength(0);
+        {            
+            this.isHeaderSent = false;
+            this.stream.SetLength(0);
         }
     }
 }

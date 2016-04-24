@@ -1,4 +1,4 @@
-﻿namespace Griffin.Core.Net.Protocols.Http.MJpeg
+﻿namespace Griffin.Core.Net.Protocols.Http.Multipart
 {
     public sealed class LiveStreamMessage
     {
