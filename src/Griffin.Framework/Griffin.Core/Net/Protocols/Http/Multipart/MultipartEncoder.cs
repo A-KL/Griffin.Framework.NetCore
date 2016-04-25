@@ -11,18 +11,19 @@
         private readonly MemoryStream stream;
         private readonly StreamWriter writer;
 
+        private readonly byte[] buffer = new byte[65535];
+
+        private bool nextFrameAvailable;
         private bool isHeaderSent;
 
         private IHttpStreamResponse message;
-
-        private bool nextFrameAvailable;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipartEncoder"/> class.
         /// </summary>
         public MultipartEncoder()
         {
-            this.stream = new MemoryStream();
+            this.stream = new MemoryStream(this.buffer);
             this.stream.SetLength(0);
 
             this.writer = new StreamWriter(this.stream);
@@ -91,9 +92,7 @@
             this.nextFrameAvailable = this.message.StreamSource.WriteNextFrame(this.multipartStream);
 
             // Send
-            var streamBuffer = this.stream.ToArray();
-
-            buffer.SetBuffer(streamBuffer, 0, streamBuffer.Length);
+            buffer.SetBuffer(this.buffer, 0, (int)this.stream.Length);
         }
 
         public bool OnSendCompleted(int bytesTransferred)
