@@ -18,13 +18,10 @@ namespace Griffin.Core.Net.Protocols.Http.Multipart
         private bool nextFrameAvailable;
         private bool isHeaderSent;
 
-        private IHttpStreamResponse message;
+        private IHttpStreamResponse response;
         
-        private Stopwatch stopwatch = new Stopwatch();
+       // private Stopwatch stopwatch = new Stopwatch();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MultipartEncoder"/> class.
-        /// </summary>
         public MultipartEncoder()
         {
             this.stream = new MemoryStream(this.buffer);
@@ -36,22 +33,22 @@ namespace Griffin.Core.Net.Protocols.Http.Multipart
 
         public void Prepare(object message)
         {
-            var liveSteram = message as IHttpStreamResponse;
-            if (liveSteram == null)
+            var streamResponse = message as IHttpStreamResponse;
+            if (streamResponse == null)
             {
                 throw new InvalidOperationException("This encoder only supports messages deriving from 'IHttpStreamResponse'");
             }
 
-            this.message = liveSteram;
+            this.response = streamResponse;
 
-            if (this.message.Body != null && this.message.Body.Length != 0)
+            if (this.response.Body != null && this.response.Body.Length != 0)
             {
-                this.message.Body.Dispose();
-                this.message.Body = null;
+                this.response.Body.Dispose();
+                this.response.Body = null;
             }
 
-            this.message.Headers["Content-Length"] = string.Empty;
-            this.message.Headers["Content-Type"] = "multipart/x-mixed-replace;boundary=" + this.multipartStream.Boundary;
+            this.response.Headers["Content-Length"] = string.Empty;
+            this.response.Headers["Content-Type"] = "multipart/x-mixed-replace;boundary=" + this.multipartStream.Boundary;
         }
 
         public void Send(ISocketBuffer buffer)
@@ -61,9 +58,9 @@ namespace Griffin.Core.Net.Protocols.Http.Multipart
 
             if (!this.isHeaderSent)
             {
-                this.writer.WriteLine(this.message.StatusLine);
+                this.writer.WriteLine(this.response.StatusLine);
 
-                foreach (var header in this.message.Headers)
+                foreach (var header in this.response.Headers)
                 {
                     if (string.IsNullOrEmpty(header.Key))
                     {
@@ -77,35 +74,23 @@ namespace Griffin.Core.Net.Protocols.Http.Multipart
 
 
                 this.isHeaderSent = true;
-                buffer.UserToken = this.message;
+                buffer.UserToken = this.response;
                 this.writer.Flush();
             }
 
-            // Write frame
-            //var frame = this.framesEnumerator.Current;
+            //stopwatch.Stop();
 
-            // Frame header
-            //this.multipartStream.Write();
+            //Debug.WriteLine("Network: " + stopwatch.ElapsedMilliseconds);
 
-            //var frameHeader = $"--{this.boundary}\r\nContent-Type: image/jpeg\r\nContent-Length: {frame.DataSize}\r\n\r\n";
-            //this.writer.Write(frameHeader);
+            //stopwatch.Restart();
 
-            // Frame body & header
-            // this.multipartStream.Write(frame.Data.ToArray(), 0, (int)frame.DataSize);
+            this.nextFrameAvailable = this.response.StreamSource.WriteNextFrame(this.multipartStream).Result;
 
-            stopwatch.Stop();
+            //stopwatch.Stop();
 
-            Debug.WriteLine("Network: " + stopwatch.ElapsedMilliseconds);
+            //Debug.WriteLine("Encoding: " + stopwatch.ElapsedMilliseconds);
 
-            stopwatch.Restart();
-
-            this.nextFrameAvailable = this.message.StreamSource.WriteNextFrame(this.multipartStream).Result;
-
-            stopwatch.Stop();
-
-            Debug.WriteLine("Encoding: " + stopwatch.ElapsedMilliseconds);
-
-            stopwatch.Restart();
+            //stopwatch.Restart();
 
             // Send
             buffer.SetBuffer(this.buffer, 0, (int)this.stream.Length);
