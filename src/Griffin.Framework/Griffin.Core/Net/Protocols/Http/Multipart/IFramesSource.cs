@@ -1,7 +1,10 @@
 ﻿namespace Griffin.Core.Net.Protocols.Http.Multipart
 {
-    public interface IFramesSource
+    using System;
+    using System.Threading.Tasks;
+
+    public interface IFramesSource : IDisposable
     {
-        bool WriteNextFrame(MultipartStream stream);
+        Task<bool> WriteNextFrame(MultipartStream stream);
     }
 }

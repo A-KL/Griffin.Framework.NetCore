@@ -1,4 +1,6 @@
-﻿namespace Griffin.Core.Net.Protocols.Http.Multipart
+﻿using System.Diagnostics;
+
+namespace Griffin.Core.Net.Protocols.Http.Multipart
 {
     using System;
     using System.IO;
@@ -18,6 +20,8 @@
 
         private IHttpStreamResponse message;
         
+        private Stopwatch stopwatch = new Stopwatch();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipartEncoder"/> class.
         /// </summary>
@@ -89,7 +93,19 @@
             // Frame body & header
             // this.multipartStream.Write(frame.Data.ToArray(), 0, (int)frame.DataSize);
 
-            this.nextFrameAvailable = this.message.StreamSource.WriteNextFrame(this.multipartStream);
+            stopwatch.Stop();
+
+            Debug.WriteLine("Network: " + stopwatch.ElapsedMilliseconds);
+
+            stopwatch.Restart();
+
+            this.nextFrameAvailable = this.message.StreamSource.WriteNextFrame(this.multipartStream).Result;
+
+            stopwatch.Stop();
+
+            Debug.WriteLine("Encoding: " + stopwatch.ElapsedMilliseconds);
+
+            stopwatch.Restart();
 
             // Send
             buffer.SetBuffer(this.buffer, 0, (int)this.stream.Length);
@@ -97,6 +113,8 @@
 
         public bool OnSendCompleted(int bytesTransferred)
         {
+
+
             return !this.nextFrameAvailable;
         }
 
